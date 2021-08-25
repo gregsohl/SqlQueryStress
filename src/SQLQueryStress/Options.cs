@@ -22,6 +22,7 @@ namespace SQLQueryStress
             connectionPooling_checkBox.Checked = settings.EnableConnectionPooling;
             IOStatistics_checkBox.Checked = settings.CollectIoStats;
             timeStatistics_checkBox.Checked = settings.CollectTimeStats;
+			dataStatistics_checkBox.Checked = settings.CollectDataSizeStats;
             clientDataRetrieval_checkBox.Checked = settings.ForceDataRetrieval;
             killQueriesOnCancel_checkBox.Checked = settings.KillQueriesOnCancel;
         }
@@ -38,6 +39,7 @@ namespace SQLQueryStress
             _settings.EnableConnectionPooling = connectionPooling_checkBox.Checked;
             _settings.CollectIoStats = IOStatistics_checkBox.Checked;
             _settings.CollectTimeStats = timeStatistics_checkBox.Checked;
+			_settings.CollectDataSizeStats = dataStatistics_checkBox.Checked;
             _settings.ForceDataRetrieval = clientDataRetrieval_checkBox.Checked;
             _settings.KillQueriesOnCancel = killQueriesOnCancel_checkBox.Checked;
 

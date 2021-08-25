@@ -13,7 +13,8 @@ namespace SQLQueryStress
         private static CancellationTokenSource _backgroundWorkerCTS;
         private readonly bool _collectIoStats;
         private readonly bool _collectTimeStats;
-        private readonly List<SqlCommand> _commandPool = new List<SqlCommand>();
+		private readonly bool _collectDataSizeStats;
+		private readonly List<SqlCommand> _commandPool = new List<SqlCommand>();
         private readonly int _commandTimeout;
 
         private readonly string _connectionString;
@@ -30,9 +31,21 @@ namespace SQLQueryStress
 		private static int _finishedThreads;
         private int _queryDelay;
 
-        public LoadEngine(string connectionString, string query, int threads, int iterations, string paramQuery,
-            Dictionary<string, string> paramMappings, string paramConnectionString, int commandTimeout,
-            bool collectIoStats, bool collectTimeStats, bool forceDataRetrieval, bool killQueriesOnCancel, CancellationTokenSource cts)
+        public LoadEngine(
+			string connectionString,
+			string query,
+			int threads,
+			int iterations,
+			string paramQuery,
+			Dictionary<string, string> paramMappings,
+			string paramConnectionString,
+			int commandTimeout,
+			bool collectIoStats,
+			bool collectTimeStats,
+			bool collectDataSizeStats,
+			bool forceDataRetrieval,
+			bool killQueriesOnCancel,
+			CancellationTokenSource cts)
         {
             //Set the min pool size so that the pool does not have
             //to get allocated in real-time
@@ -53,7 +66,8 @@ namespace SQLQueryStress
             _commandTimeout = commandTimeout;
             _collectIoStats = collectIoStats;
             _collectTimeStats = collectTimeStats;
-            _forceDataRetrieval = forceDataRetrieval;
+			_collectDataSizeStats = collectDataSizeStats;
+			_forceDataRetrieval = forceDataRetrieval;
             _killQueriesOnCancel = killQueriesOnCancel;
             _backgroundWorkerCTS = cts;
         }
@@ -139,7 +153,7 @@ namespace SQLQueryStress
 
                 using var input = new QueryInput(statsComm, queryComm,
                     QueryOutInfo,
-                    _iterations, _forceDataRetrieval, _queryDelay, worker, _killQueriesOnCancel, _threads);
+                    _iterations, _forceDataRetrieval, _queryDelay, worker, _killQueriesOnCancel, _threads, _collectDataSizeStats);
 
                 var theThread = new Thread(input.StartLoadThread) { Priority = ThreadPriority.BelowNormal, IsBackground = true };
                 theThread.Name = "thread: " + i;

@@ -93,6 +93,8 @@ namespace SQLQueryStress
 			this.logicalReads_textBox = new System.Windows.Forms.Label();
 			this.db_label = new System.Windows.Forms.Label();
 			this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+			this.dataReceived_textBox = new System.Windows.Forms.Label();
+			this.label13 = new System.Windows.Forms.Label();
 			this.label10 = new System.Windows.Forms.Label();
 			this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
 			this.actualSeconds_textBox = new System.Windows.Forms.Label();
@@ -104,8 +106,6 @@ namespace SQLQueryStress
 			this.label11 = new System.Windows.Forms.Label();
 			this.queryDelay_numericUpDown = new System.Windows.Forms.NumericUpDown();
 			this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
-			this.label13 = new System.Windows.Forms.Label();
-			this.dataReceived_textBox = new System.Windows.Forms.Label();
 			this.menuStrip1.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.iterations_numericUpDown)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.threads_numericUpDown)).BeginInit();
@@ -636,6 +636,31 @@ namespace SQLQueryStress
 			this.tableLayoutPanel1.Size = new System.Drawing.Size(471, 518);
 			this.tableLayoutPanel1.TabIndex = 1;
 			// 
+			// dataReceived_textBox
+			// 
+			this.dataReceived_textBox.BackColor = System.Drawing.Color.Black;
+			this.dataReceived_textBox.Cursor = System.Windows.Forms.Cursors.Default;
+			this.dataReceived_textBox.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.dataReceived_textBox.Font = new System.Drawing.Font("Courier New", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+			this.dataReceived_textBox.ForeColor = System.Drawing.Color.Lime;
+			this.dataReceived_textBox.Location = new System.Drawing.Point(3, 479);
+			this.dataReceived_textBox.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+			this.dataReceived_textBox.Name = "dataReceived_textBox";
+			this.dataReceived_textBox.Size = new System.Drawing.Size(230, 35);
+			this.dataReceived_textBox.TabIndex = 36;
+			this.dataReceived_textBox.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// label13
+			// 
+			this.label13.AutoSize = true;
+			this.label13.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.label13.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+			this.label13.Location = new System.Drawing.Point(3, 459);
+			this.label13.Name = "label13";
+			this.label13.Size = new System.Drawing.Size(230, 16);
+			this.label13.TabIndex = 35;
+			this.label13.Text = "Data Retrieved";
+			// 
 			// label10
 			// 
 			this.label10.AutoSize = true;
@@ -781,31 +806,6 @@ namespace SQLQueryStress
 			this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
 			this.tableLayoutPanel3.Size = new System.Drawing.Size(865, 526);
 			this.tableLayoutPanel3.TabIndex = 2;
-			// 
-			// label13
-			// 
-			this.label13.AutoSize = true;
-			this.label13.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.label13.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-			this.label13.Location = new System.Drawing.Point(3, 459);
-			this.label13.Name = "label13";
-			this.label13.Size = new System.Drawing.Size(230, 16);
-			this.label13.TabIndex = 35;
-			this.label13.Text = "Data Retrieved";
-			// 
-			// dataReceived_textBox
-			// 
-			this.dataReceived_textBox.BackColor = System.Drawing.Color.Black;
-			this.dataReceived_textBox.Cursor = System.Windows.Forms.Cursors.Default;
-			this.dataReceived_textBox.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.dataReceived_textBox.Font = new System.Drawing.Font("Courier New", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-			this.dataReceived_textBox.ForeColor = System.Drawing.Color.Lime;
-			this.dataReceived_textBox.Location = new System.Drawing.Point(3, 479);
-			this.dataReceived_textBox.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-			this.dataReceived_textBox.Name = "dataReceived_textBox";
-			this.dataReceived_textBox.Size = new System.Drawing.Size(230, 35);
-			this.dataReceived_textBox.TabIndex = 36;
-			this.dataReceived_textBox.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// Form1
 			// 

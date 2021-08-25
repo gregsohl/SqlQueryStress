@@ -15,11 +15,14 @@ namespace SQLQueryStress
 {
 	internal class QueryInput : IDisposable
 	{
-		[ThreadStatic] private static QueryOutput _outInfo;
+		[ThreadStatic]
+		private static QueryOutput _outInfo;
 
 		//This regex is used to find the number of logical reads
 		//in the messages collection returned in the queryOutput class
-		private static readonly Regex FindReads = new Regex(@"(?:Table (\'\w{1,}\'|'#\w{1,}\'|'##\w{1,}\'). Scan count \d{1,}, logical reads )(\d{1,})", RegexOptions.Compiled);
+		private static readonly Regex FindReads = new Regex(
+			@"(?:Table (\'\w{1,}\'|'#\w{1,}\'|'##\w{1,}\'). Scan count \d{1,}, logical reads )(\d{1,})",
+			RegexOptions.Compiled);
 
 		//This regex is used to find the CPU and elapsed time
 		//in the messages collection returned in the queryOutput class
@@ -37,16 +40,27 @@ namespace SQLQueryStress
 
 		private readonly Stopwatch _sw = new Stopwatch();
 		private readonly System.Timers.Timer _killTimer = new System.Timers.Timer();
+
 		private readonly bool _forceDataRetrieval;
+
 		//          private readonly Queue<queryOutput> queryOutInfo;
 		private readonly int _iterations;
 		private readonly int _queryDelay;
 		private readonly int _numWorkerThreads;
+		private readonly bool _collectDataSizeStats;
 		private readonly BackgroundWorker _backgroundWorker;
 
-		public QueryInput(SqlCommand statsComm, SqlCommand queryComm,
+		public QueryInput(
+			SqlCommand statsComm,
+			SqlCommand queryComm,
 			BlockingCollection<QueryOutput> queryOutInfo,
-			int iterations, bool forceDataRetrieval, int queryDelay, BackgroundWorker _backgroundWorker, bool killQueriesOnCancel, int numWorkerThreads)
+			int iterations,
+			bool forceDataRetrieval,
+			int queryDelay,
+			BackgroundWorker _backgroundWorker,
+			bool killQueriesOnCancel,
+			int numWorkerThreads,
+			bool collectDataSizeStats)
 		{
 			_statsComm = statsComm;
 			_queryComm = queryComm;
@@ -56,6 +70,7 @@ namespace SQLQueryStress
 			_forceDataRetrieval = forceDataRetrieval;
 			_queryDelay = queryDelay;
 			_numWorkerThreads = numWorkerThreads;
+			_collectDataSizeStats = collectDataSizeStats;
 
 			//Prepare the infoMessages collection, if we are collecting statistics
 			//if (stats_comm != null)
@@ -71,20 +86,25 @@ namespace SQLQueryStress
 			}
 		}
 
-		private void KillTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+		private void KillTimer_Elapsed(
+			object sender,
+			System.Timers.ElapsedEventArgs e)
 		{
 			if (_backgroundWorker.CancellationPending)
 			{
 				_queryComm.Cancel();
 				_killTimer.Enabled = false;
 			}
-			else if (_queryComm.Connection == null || _queryComm.Connection.State == ConnectionState.Closed)
-			{
-				_killTimer.Enabled = false;
-			}
+			else
+				if (_queryComm.Connection == null || _queryComm.Connection.State == ConnectionState.Closed)
+				{
+					_killTimer.Enabled = false;
+				}
 		}
 
-		private static void GetInfoMessages(object sender, SqlInfoMessageEventArgs args)
+		private static void GetInfoMessages(
+			object sender,
+			SqlInfoMessageEventArgs args)
 		{
 			foreach (SqlError err in args.Errors)
 			{
@@ -108,27 +128,32 @@ namespace SQLQueryStress
 			}
 		}
 
-		public void StartLoadThread(Object token)
+		public void StartLoadThread(
+			Object token)
 		{
 			bool runCancelled = false;
 
 			CancellationToken ctsToken = (CancellationToken)token;
 			try
 			{
-				ctsToken.Register(() =>
-				{
-					// Cancellation on the token will interrupt and cancel the thread
-					runCancelled = true;
-					_statsComm.Cancel();
-					_queryComm.Cancel();
-				});
+				ctsToken.Register(
+					() =>
+					{
+						// Cancellation on the token will interrupt and cancel the thread
+						runCancelled = true;
+						_statsComm.Cancel();
+						_queryComm.Cancel();
+					});
 				//do the work
 				using (var conn = _queryComm.Connection)
 				{
 					bool statisticsEnabled = conn.StatisticsEnabled;
 
-					conn.StatisticsEnabled = true;
-					conn.ResetStatistics();
+					if (_collectDataSizeStats)
+					{
+						conn.StatisticsEnabled = true;
+						conn.ResetStatistics();
+					}
 
 					SqlInfoMessageEventHandler handler = GetInfoMessages;
 
@@ -208,6 +233,7 @@ namespace SQLQueryStress
 								{
 									conn.InfoMessage -= handler;
 								}
+
 								conn.Close();
 							}
 						}
@@ -230,6 +256,18 @@ namespace SQLQueryStress
 						_outInfo.Time = _sw.Elapsed;
 						_outInfo.Finished = finished;
 
+						if (_collectDataSizeStats)
+						{
+							long bytesReceived = 0L;
+							IDictionary retrieveStatistics = conn.RetrieveStatistics();
+							if (retrieveStatistics != null)
+							{
+								bytesReceived = (long)retrieveStatistics["BytesReceived"];
+							}
+
+							_outInfo.BytesReceived = bytesReceived;
+						}
+
 						_queryOutInfo.Add(_outInfo);
 
 						//Prep the collection for the next round
@@ -247,31 +285,28 @@ namespace SQLQueryStress
 							}
 							catch (AggregateException ae)
 							{
-								ae.Handle((x) =>
-								{
-									if (x is TaskCanceledException)
+								ae.Handle(
+									(
+										x) =>
 									{
-										runCancelled = true;
-										return true;
-									}
-									// if we get here, the exception wasn't a cancel
-									// so don't swallow it
-									return false;
-								});
+										if (x is TaskCanceledException)
+										{
+											runCancelled = true;
+											return true;
+										}
+
+										// if we get here, the exception wasn't a cancel
+										// so don't swallow it
+										return false;
+									});
 							}
 						}
 					}
 
-					long bytesReceived = 0L;
-					IDictionary retrieveStatistics = conn.RetrieveStatistics();
-					if (retrieveStatistics != null)
+					if (_collectDataSizeStats)
 					{
-						bytesReceived = (long)retrieveStatistics["BytesReceived"];
+						conn.StatisticsEnabled = statisticsEnabled;
 					}
-
-					_outInfo.BytesReceived = bytesReceived;
-
-					conn.StatisticsEnabled = statisticsEnabled;
 				}
 			}
 			catch (Exception)

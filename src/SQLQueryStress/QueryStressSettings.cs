@@ -23,7 +23,13 @@ namespace SQLQueryStress
         [DataMember]
         public bool CollectTimeStats { get; set; }
 
-        /// <summary>
+		/// <summary>
+		///     Collect data size stats?
+		/// </summary>
+		[DataMember]
+		public bool CollectDataSizeStats { get; set; }
+
+		/// <summary>
         ///     command timeout
         /// </summary>
         [DataMember]
@@ -121,6 +127,7 @@ namespace SQLQueryStress
             EnableConnectionPooling = true;
             CollectIoStats = true;
             CollectTimeStats = true;
+			CollectDataSizeStats = true;
             ForceDataRetrieval = false;
             KillQueriesOnCancel = true;
             MainDbConnectionInfo = new ConnectionInfo(ConnectionTimeout, EnableConnectionPooling, NumThreads * 2);

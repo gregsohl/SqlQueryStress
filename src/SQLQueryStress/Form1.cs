@@ -322,6 +322,7 @@ namespace SQLQueryStress
 
             iterationsSecond_textBox.Text = @"0";
             avgSeconds_textBox.Text = @"0.0";
+            dataReceived_textBox.Text = @"0";
             actualSeconds_textBox.Text = Dashes;
             cpuTime_textBox.Text = Dashes;
             logicalReads_textBox.Text = Dashes;
@@ -340,9 +341,21 @@ namespace SQLQueryStress
             var paramConnectionInfo = _settings.ShareDbSettings ? _settings.MainDbConnectionInfo : _settings.ParamDbConnectionInfo;
             db_label.Text = $@"Server: {paramConnectionInfo.Server}{(paramConnectionInfo.Database.Length > 0 ? "  //  Database: " + paramConnectionInfo.Database : string.Empty)}";
 
-            var engine = new LoadEngine(_settings.MainDbConnectionInfo.ConnectionString, _settings.MainQuery, _settings.NumThreads, _settings.NumIterations,
-                _settings.ParamQuery, _settings.ParamMappings, paramConnectionInfo.ConnectionString, _settings.CommandTimeout, _settings.CollectIoStats,
-                _settings.CollectTimeStats, _settings.ForceDataRetrieval, _settings.KillQueriesOnCancel, _backgroundWorkerCTS);
+			var engine = new LoadEngine(
+				_settings.MainDbConnectionInfo.ConnectionString,
+				_settings.MainQuery,
+				_settings.NumThreads,
+				_settings.NumIterations,
+				_settings.ParamQuery,
+				_settings.ParamMappings,
+				paramConnectionInfo.ConnectionString,
+				_settings.CommandTimeout,
+				_settings.CollectIoStats,
+				_settings.CollectTimeStats,
+                _settings.CollectDataSizeStats,
+				_settings.ForceDataRetrieval,
+				_settings.KillQueriesOnCancel,
+				_backgroundWorkerCTS);
 
             backgroundWorker1.RunWorkerAsync(engine);
 
@@ -462,7 +475,7 @@ namespace SQLQueryStress
             actualSeconds_textBox.Text = _totalTimeMessages == 0 ? "---" : avgActual.ToString("0.0000", CultureInfo.CurrentCulture);
             logicalReads_textBox.Text = _totalReadMessages == 0 ? "---" : avgReads.ToString("0.0000", CultureInfo.CurrentCulture);
 
-			dataReceived_textBox.Text = _totalDataReceived.ToString("0,0", CultureInfo.CurrentCulture);
+			dataReceived_textBox.Text = _totalDataReceived.ToString("N0", CultureInfo.CurrentCulture);
 
             totalExceptions_textBox.Text = _totalExceptions.ToString(CultureInfo.CurrentCulture);
             progressBar1.Value = Math.Min((int)(_totalIterations / (decimal)_totalExpectedIterations * 100), 100);
