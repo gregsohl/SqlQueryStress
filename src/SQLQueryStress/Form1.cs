@@ -65,6 +65,8 @@ namespace SQLQueryStress
         //This is the total time as reported by the client
         private double _totalTime;
 
+		private long _totalDataReceived;
+
         //Number of query requests that returned time messages
         //Note:: Average times will be computed by:
         // A) Add up all results from time messages returned by 
@@ -152,7 +154,7 @@ namespace SQLQueryStress
 
         private void backgroundWorker1_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            var output = (LoadEngine.QueryOutput)e.UserState;
+            var output = (QueryOutput)e.UserState;
 
             _totalIterations++;
 
@@ -170,6 +172,8 @@ namespace SQLQueryStress
             }
 
             _totalTime += output.Time.TotalMilliseconds;
+
+			_totalDataReceived += output.BytesReceived;
 
             if (output.E != null)
             {
@@ -314,6 +318,7 @@ namespace SQLQueryStress
             _totalLogicalReads = 0;
             _totalReadMessages = 0;
             _totalExceptions = 0;
+			_totalDataReceived = 0L;
 
             iterationsSecond_textBox.Text = @"0";
             avgSeconds_textBox.Text = @"0.0";
@@ -456,6 +461,8 @@ namespace SQLQueryStress
             cpuTime_textBox.Text = _totalTimeMessages == 0 ? "---" : avgCpu.ToString("0.0000", CultureInfo.CurrentCulture);
             actualSeconds_textBox.Text = _totalTimeMessages == 0 ? "---" : avgActual.ToString("0.0000", CultureInfo.CurrentCulture);
             logicalReads_textBox.Text = _totalReadMessages == 0 ? "---" : avgReads.ToString("0.0000", CultureInfo.CurrentCulture);
+
+			dataReceived_textBox.Text = _totalDataReceived.ToString("0,0", CultureInfo.CurrentCulture);
 
             totalExceptions_textBox.Text = _totalExceptions.ToString(CultureInfo.CurrentCulture);
             progressBar1.Value = Math.Min((int)(_totalIterations / (decimal)_totalExpectedIterations * 100), 100);
